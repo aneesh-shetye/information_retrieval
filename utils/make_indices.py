@@ -1,4 +1,4 @@
-#creating chunks and indices 
+#creating chunks and indices of text documents 
 import os 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 

@@ -307,7 +307,7 @@ def index_embeddings(
     '''
     embeddings_path = os.path.join('/Users/ssarch/Documents/sovai/benchmarking/ragatouille/lucidrains/RETRO-pytorch', embeddings_path) 
 
-    index = faiss.IndexFlatL2(768)#embedding dimension 
+    index = faiss.IndexFlatL2(BERT_MODEL_DIM)#embedding dimension 
 
     for embeddings_file in os.listdir(embeddings_path): 
         data = np.load(os.path.join('tmp/embeddings/', embeddings_file))  

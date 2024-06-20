@@ -1,3 +1,4 @@
+#gets the dataframe from gcs
 import pandas as pd  
 
 service_account_info = {
