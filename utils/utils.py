@@ -35,7 +35,7 @@ def get_text(url: str):
       print("Failed to parse text")
       return None
 
-    paragraphs = soup.findall('p')
+    paragraphs = soup.find_all('p')
     text = "\n\n".join([para.get_text()for para in paragraphs]) 
 
     text = preprocess_text(text)

@@ -314,6 +314,7 @@ def index_embeddings(
         index.add(data) 
 
     print(f'number of embeddings added = {index.ntotal}') 
+    print(f'Require training? Ans: {index.is_trained}') 
 
     return index
 
