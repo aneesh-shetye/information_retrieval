@@ -2,6 +2,10 @@
 import os 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
 import time
 import argparse
 from retro_pytorch.retrieval import text_folder_to_chunks_, chunks_to_index_and_embed
@@ -41,7 +45,7 @@ if __name__ == '__main__':
         glob = '**/*.txt',
         chunks_memmap_path = args.chunksFolder,
         seqs_memmap_path = args.seqFolder,
-        doc_ids_memmap_path = args.docIdFolder,  # document ids are needed for filtering out neighbors belonging to same document appropriately during computation of nearest neighbors
+        doc_ids_memmap_path = args.docIdsFolder,  # document ids are needed for filtering out neighbors belonging to same document appropriately during computation of nearest neighbors
         chunk_size = args.chunkSize,
         seq_len = args.seqLen,
         max_chunks = args.maxChunks,
@@ -62,15 +66,16 @@ if __name__ == '__main__':
 
     print(f'FAISS index created at: {args.indexFolder}')
     print("###################################################")
-    print('sanity check: query= Doc 1, k = 2')
-    query_vector = embeddings[:1]                   # use first embedding as query
 
     k = 5
+    print(f'sanity check: query= Doc 1, k = {k}')
+    query_vector = embeddings[:1]                   # use first embedding as query
+
     start_time = time.time()
     x, indices = index.search(query_vector, k = k)  # fetch k neighbors, first indices should be self
     end_time = time.time()
 
-    print(f'TIME FOR SEARCHING {k}-NN: {start_time - end_time}')
+    print(f'TIME FOR SEARCHING {k}-NN: {end_time - start_time}')
 
     neighbor_embeddings = embeddings[indices]       # (1, 2, 768)
     print(x, indices)

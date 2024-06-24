@@ -294,7 +294,7 @@ def index_embeddings(
     reset_folder_(INDEX_FOLDER_PATH)
 
     #print(f'embeddings_path:{embeddings_path}') 
-    embeddings_path = os.path.join('/Users/ssarch/Documents/sovai/benchmarking/ragatouille/lucidrains/RETRO-pytorch', embeddings_path) 
+    embeddings_path = os.path.join(os.getcwd(), embeddings_path) 
     #print(f'embedding_path:{embeddings_path}') 
 
     '''
@@ -312,7 +312,7 @@ def index_embeddings(
 
     index = faiss_read_index(index_path)
     '''
-    embeddings_path = os.path.join('/Users/ssarch/Documents/sovai/benchmarking/ragatouille/lucidrains/RETRO-pytorch', embeddings_path) 
+    embeddings_path = os.path.join(os.getcwd(), embeddings_path) 
 
     d = BERT_MODEL_DIM
     
@@ -347,7 +347,7 @@ def index_embeddings(
     
     end_time = time.time()
 
-    print(f'TIME FOR MAKING THE INDICES: {start_time-end_time}')
+    print(f'TIME FOR MAKING THE INDICES: {end_time-start_time}')
     print(f'number of embeddings added = {index.ntotal}') 
     print(f'Require training? Ans: {index.is_trained}') 
 
