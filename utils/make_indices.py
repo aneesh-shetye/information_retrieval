@@ -2,6 +2,7 @@
 import os 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
+import time
 import argparse
 from retro_pytorch.retrieval import text_folder_to_chunks_, chunks_to_index_and_embed
 import faiss 
@@ -63,7 +64,13 @@ if __name__ == '__main__':
     print("###################################################")
     print('sanity check: query= Doc 1, k = 2')
     query_vector = embeddings[:1]                   # use first embedding as query
-    x, indices = index.search(query_vector, k = 2)  # fetch 2 neighbors, first indices should be self
+
+    k = 5
+    start_time = time.time()
+    x, indices = index.search(query_vector, k = k)  # fetch k neighbors, first indices should be self
+    end_time = time.time()
+
+    print(f'TIME FOR SEARCHING {k}-NN: {start_time - end_time}')
 
     neighbor_embeddings = embeddings[indices]       # (1, 2, 768)
     print(x, indices)

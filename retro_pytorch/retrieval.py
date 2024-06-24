@@ -1,6 +1,7 @@
 import os 
 from pathlib import Path
 from math import ceil
+import time
 
 import torch
 import torch.nn.functional as F
@@ -93,6 +94,7 @@ def doc_text_to_chunks_and_seq_indices(
 
     ids = tokenize(doc_text)
     ids = rearrange(ids, '1 ... -> ...')
+    #ids.shape = text_len
 
     text_len = ids.shape[-1]
 
@@ -100,21 +102,26 @@ def doc_text_to_chunks_and_seq_indices(
 
     padding = chunk_size - ((text_len - 1) % chunk_size)
     ids = F.pad(ids, (0, padding))
+    #ids.shape = chunk_size
 
     # split out very last token
 
     ids, last_token = ids[:-1], ids[-1:]
-    ids = rearrange(ids, '(n c) -> n c', c = chunk_size)
+    ids = rearrange(ids, '(n c) -> n c', c = chunk_size) #(n=num_chunks)
+    #ids.shape = num_chunks, chunk_size 
 
     # first tokens of chunk [2:] and on will become the last token of chunk [1:]
 
     last_token_per_chunk = ids[1:, 0]
     all_last_tokens = torch.cat((last_token_per_chunk, last_token), dim = 0)
+    #all_last_tokens.shape = num_chunks
     all_last_tokens = rearrange(all_last_tokens, 'n -> n 1')
+    #all_last_tokens.shape = num_chunks, 1
 
     # append all last tokens to ids for (num_chunks, chunk_size + 1)
 
     chunks_with_extra_token = torch.cat((ids, all_last_tokens), dim = -1)
+    #chunks_with_extra_tokens.shape = num_chunks, chunk_size + 1
 
     # calculate chunk indices starting at 0, spaced number of chunks of seq len apart
 
@@ -307,12 +314,40 @@ def index_embeddings(
     '''
     embeddings_path = os.path.join('/Users/ssarch/Documents/sovai/benchmarking/ragatouille/lucidrains/RETRO-pytorch', embeddings_path) 
 
-    index = faiss.IndexFlatL2(BERT_MODEL_DIM)#embedding dimension 
+    d = BERT_MODEL_DIM
+    
+    start_time = time.time()
+    ############################################
+    #Flat index:
+    index = faiss.IndexFlatL2(d)#embedding dimension 
+    ############################################
+    #LSH Index: 
+    #nbits = d*4
+    #index = faiss.IndexLSH(d, nbits)
+    ############################################
+    #HNSW index: 
+    #M = 64 #number of connections for each vertex  
+    #ef_search = 64 #Depth of layers explored during search
+    #ef_construction = 128 #depth of layers explored during index construction
+    #index = faiss.IndexHNSWFlat(d, M) 
+    #index.hnsw.dfConstruction = ef_construction 
+    #index.hnsw.efSearch = ef_search
+    ############################################
+    #IVF index: 
+    #nlist = 128 #number of cells/clusters to partition the data into 
+    #quantizer = faiss.IndexFlatIP(d)
+    #quantizer = faiss.IndexIVFFlat(quantizer, d, nlist)
+    #index.train(data)
+    #index.nprobe = 8 #number of nearest cells to search
+
 
     for embeddings_file in os.listdir(embeddings_path): 
         data = np.load(os.path.join('tmp/embeddings/', embeddings_file))  
         index.add(data) 
+    
+    end_time = time.time()
 
+    print(f'TIME FOR MAKING THE INDICES: {start_time-end_time}')
     print(f'number of embeddings added = {index.ntotal}') 
     print(f'Require training? Ans: {index.is_trained}') 
 
@@ -387,6 +422,7 @@ def chunks_to_precalculated_knn_(
         print(f'preprocessed knn found at {str(knn_path)}, faiss index reconstituted from {str(index_path)}')
         index = faiss_read_index(index_path)
         return knn_path, index
+    
 
     # fetch the faiss index and calculated embeddings for the chunks
 
@@ -434,3 +470,6 @@ def chunks_to_precalculated_knn_(
 
     print(f'knn saved to {knn_path}')
     return knn_path, index
+
+
+
