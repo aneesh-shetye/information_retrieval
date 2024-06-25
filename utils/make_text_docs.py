@@ -35,7 +35,7 @@ if __name__ == "__main__":
         else:
             indices_to_skip.append(index)
 
-    file_name = 'skipped_indices'
+    file_name = 'skipped_indices.json'
     skipped_file = os.path.join(args.skipped_folder, file_name)
 
     with open(skipped_file, 'w') as file: 

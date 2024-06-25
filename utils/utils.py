@@ -48,18 +48,26 @@ def get_text(url: str):
     response = fetch_content(url)
     # response.raise_for_status() #raise exception for HTTP errors
     if response.status_code != 200: 
-      print("Failed to retrieve text")
-      return None 
-
+      text = fetch_content2(url)
+      if text is None: 
+        return text 
+      else: 
+        return preprocess_text(text)
+      
     soup = bs(response.text, 'html.parser')
     #text = soup.get_text()
-    if soup is None:
+
+    if soup is not None: 
+      paragraphs = soup.find_all('p')
+      text = "\n\n".join([para.get_text()for para in paragraphs]) 
+    
+    else: 
+      text = fetch_content2(url)
+
+    if text is None: 
       print("Failed to parse text")
       return None
-
-    paragraphs = soup.find_all('p')
-    text = "\n\n".join([para.get_text()for para in paragraphs]) 
-
+    
     text = preprocess_text(text)
     return text
 
