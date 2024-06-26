@@ -1,0 +1,10 @@
+text_docs/
+TextDocs/
+index.dat
+train.chunks.dat
+train.chunks.dat.embedded
+train.doc_ids.dat
+train.seq.dat
+
+
+

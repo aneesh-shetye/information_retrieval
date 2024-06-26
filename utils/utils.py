@@ -7,8 +7,10 @@ basic utilities. Include:
 import requests
 from bs4 import BeautifulSoup as bs
 import re
+import time
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -30,7 +32,8 @@ def fetch_content2(url):
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
     driver.get(url)
-    content = driver.page_source
+    time.sleep(5)
+    content = driver.find_element(By.XPATH, '/html/body').text()
     driver.quit()
     return content
 
@@ -48,7 +51,10 @@ def get_text(url: str):
     response = fetch_content(url)
     # response.raise_for_status() #raise exception for HTTP errors
     if response.status_code != 200: 
-      text = fetch_content2(url)
+      try:
+        text = fetch_content2(url)
+      except: 
+        text = None
       if text is None: 
         return text 
       else: 
@@ -62,7 +68,10 @@ def get_text(url: str):
       text = "\n\n".join([para.get_text()for para in paragraphs]) 
     
     else: 
-      text = fetch_content2(url)
+      try:
+        text = fetch_content2(url)
+      except: 
+        text = None
 
     if text is None: 
       print("Failed to parse text")
@@ -73,7 +82,10 @@ def get_text(url: str):
 
   except requests.exceptions.RequestException as e:
     print(f'An error occured: {e}')
-    response = fetch_content2(url)
+    try:
+      response = fetch_content2(url)
+    except: 
+      response = None
     # soup = bs(response.text, 'html.parser')
     
     if response is not None: 
@@ -82,3 +94,4 @@ def get_text(url: str):
       return preprocess_text(response)
 
     return None
+

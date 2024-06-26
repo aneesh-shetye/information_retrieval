@@ -8,7 +8,7 @@ from utils import get_text
 
 parser = argparse.ArgumentParser(description='retrieve text from urls')
 
-parser.add_argument('--textfolder', type=str, default='TextDocs', 
+parser.add_argument('--textFolder', type=str, default='TextDocs', 
                     help='folder to save text documents in ')
 parser.add_argument('--skipped_folder', type=str, default='TextDocs', 
                     help='folder in which to save a file with list of skipped rows')
@@ -18,9 +18,9 @@ args = parser.parse_args()
 if __name__ == "__main__": 
 
     df_proce = get_dataframe()
-    df = df_proce[:100].copy()
+    df = df_proce[1490:1900].copy()
 
-    output_folder = os.path.join(os.getcwd(), args.textfolder)
+    output_folder = os.path.join(os.getcwd(), args.textFolder)
     os.makedirs(output_folder, exist_ok=True)
 
     indices_to_skip = []

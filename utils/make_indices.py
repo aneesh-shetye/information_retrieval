@@ -14,17 +14,20 @@ import faiss
 parser = argparse.ArgumentParser(description='chunk documents and make faiss index')
 
 #filenames
-parser.add_argument('--textfolder', type=str, default='text_docs', help='folder with text documents')
+parser.add_argument('--textFolder', type=str, default='text_docs', help='folder with text documents')
 parser.add_argument('--chunksFolder', type=str, default='train.chunks.dat', help='folder with text documents')
 parser.add_argument('--seqFolder', type=str, default='train.seq.dat', help='folder with text documents')
 parser.add_argument('--docIdsFolder', type=str, default='train.doc_ids.dat', help='folder with text documents')
 parser.add_argument('--indexFolder', type=str, default='index.dat', help='folder with text documents')
 
 #hyperparameters: 
-parser.add_argument('--chunkSize', type=int, default=64, help='size of chunks')
-parser.add_argument('--seqLen', type=int, default=2048, help='sentence length')
-parser.add_argument('--maxChunks', type=int, default=1_000_000, help= 'max number of chunks') 
-parser.add_argument('--maxSeqs', type=int, default=100_000, help='max number of sequences')
+parser.add_argument('--chunkSize', type=int, default=128, help='size of chunks')
+parser.add_argument('--seqLen', type=int, default=4096, help='sentence length')
+parser.add_argument('--maxChunks', type=int, default=1_000_000_000, help= 'max number of chunks') 
+parser.add_argument('--maxSeqs', type=int, default=1_000_000, help='max number of sequences')
+
+#indexparameters: 
+parser.add_argument('--indexString', type=str, default=None, help='index string for FAISS index factory')
 
 args = parser.parse_args()
 #create chunks and chunk start indices
@@ -33,15 +36,16 @@ if __name__ == '__main__':
     
     '''
     root = os.getcwd()
-    text_folder = os.path.join(root, args.textfolder) 
+    text_folder = os.path.join(root, args.textFolder) 
     chunks_path = os.path.join(root, args.chunksFilename) 
     seq_path = os.path.join(root, args.seqFilename) 
     doc_id_path = os.path.join(root, args.docIdFilename) 
     faiss_index_path = os.path.join(root, args.indexFilename) 
     '''
     
+    '''
     stats = text_folder_to_chunks_(
-        folder = args.textfolder,
+        folder = args.textFolder,
         glob = '**/*.txt',
         chunks_memmap_path = args.chunksFolder,
         seqs_memmap_path = args.seqFolder,
@@ -52,12 +56,14 @@ if __name__ == '__main__':
         max_seqs = args.maxSeqs
     )
     print(stats)
+    '''
 
     #convert chunks into embeddings and faiss index 
     index, embeddings = chunks_to_index_and_embed(
         num_chunks = 1000,
         chunk_size = 64,
-        chunk_memmap_path = args.chunksFolder
+        chunk_memmap_path = args.chunksFolder, 
+        index_string = args.indexString
     )
 
     faiss.write_index(index, args.indexFolder)

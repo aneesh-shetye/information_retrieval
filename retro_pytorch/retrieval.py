@@ -228,9 +228,9 @@ def chunks_to_embeddings_(
     num_chunks,
     chunks_memmap_path,
     embeddings_memmap_path,
-    chunk_size = 64,
+    chunk_size = 128,
     embed_dim = BERT_MODEL_DIM,
-    batch_size = 16,
+    batch_size = 64,
     use_cls_repr = False,
     pad_id = 0.
 ):
@@ -349,7 +349,7 @@ def index_embeddings(
 
     print(f'TIME FOR MAKING THE INDICES: {end_time-start_time}')
     print(f'number of embeddings added = {index.ntotal}') 
-    print(f'Require training? Ans: {index.is_trained}') 
+    print(f'Require training? Ans: {not(index.is_trained)}') 
 
     return index
 
@@ -359,8 +359,8 @@ def chunks_to_index_and_embed(
     chunk_size,
     chunk_memmap_path,
     use_cls_repr = False,
-    max_rows_per_file = 500,
-    chunks_to_embeddings_batch_size = 16,
+    max_rows_per_file = 1000,
+    chunks_to_embeddings_batch_size = 64,
     embed_dim = BERT_MODEL_DIM,
     index_file = 'knn.index',
     **index_kwargs
@@ -404,7 +404,7 @@ def chunks_to_precalculated_knn_(
     doc_ids_memmap_path,
     use_cls_repr = False,
     max_rows_per_file = 500,
-    chunks_to_embeddings_batch_size = 16,
+    chunks_to_embeddings_batch_size = 64,
     embed_dim = BERT_MODEL_DIM,
     num_extra_neighbors = 10,
     force_reprocess = False,
